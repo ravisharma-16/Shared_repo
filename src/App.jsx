@@ -6,6 +6,7 @@ import MonthNav from './components/MonthNav';
 import MonthSection from './components/MonthSection';
 import Lightbox from './components/Lightbox';
 import Closing from './components/Closing';
+import PhotoLoop from './components/PhotoLoop'
 
 export default function App() {
   const reduce = useReducedMotion();
@@ -30,6 +31,7 @@ export default function App() {
             <MonthSection key={month.id} month={month} monthIndex={i} onOpen={setOpenIndex} />
           ))}
         </div>
+          <PhotoLoop photos={allPhotos} onOpen={setOpenIndex} />
       </main>
 
       <Closing photos={closingPhotos} onTop={toTop} />

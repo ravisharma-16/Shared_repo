@@ -19,6 +19,7 @@ export default function Lightbox({ photos, index, onClose, onNavigate }) {
   const dialogRef = useRef(null);
   const total = photos.length;
   const photo = photos[index];
+  const isVideo = photo.type === 'video';
 
   const go = useCallback(
     (step) => {
@@ -32,9 +33,10 @@ export default function Lightbox({ photos, index, onClose, onNavigate }) {
   // Keyboard: Esc, arrows, and a simple focus trap.
   useEffect(() => {
     const onKey = (e) => {
+      const onVideo = e.target instanceof HTMLVideoElement;
       if (e.key === 'Escape') onClose();
-      else if (e.key === 'ArrowRight') go(1);
-      else if (e.key === 'ArrowLeft') go(-1);
+      else if (e.key === 'ArrowRight' && !onVideo) go(1);
+      else if (e.key === 'ArrowLeft' && !onVideo) go(-1);
       else if (e.key === 'Tab') {
         const btns = dialogRef.current.querySelectorAll('button');
         const first = btns[0];
@@ -63,7 +65,7 @@ export default function Lightbox({ photos, index, onClose, onNavigate }) {
   useEffect(() => {
     [index - 1, index + 1].forEach((i) => {
       const p = photos[(i + total) % total];
-      if (p) new Image().src = p.src;
+      if (p && p.type !== 'video') new Image().src = p.src;
     });
   }, [index, photos, total]);
 
@@ -107,15 +109,28 @@ export default function Lightbox({ photos, index, onClose, onNavigate }) {
           animate="center"
           exit={reduce ? { opacity: 0 } : 'exit'}
           transition={{ duration: reduce ? 0 : 0.28, ease: 'easeOut' }}
-          drag={total > 1 ? 'x' : false}
+          drag={total > 1 && !isVideo ? 'x' : false}
           dragSnapToOrigin
           dragElastic={0.4}
           dragConstraints={{ left: 0, right: 0 }}
           onDragEnd={onDragEnd}
           style={{ touchAction: 'pan-y' }}
-          className="bg-white p-2 pb-8 shadow-polaroid sm:p-3 sm:pb-10"
+          className="bg-white p-2 shadow-polaroid sm:p-3"
         >
-          <img src={photo.src} alt={photo.alt} draggable="false" className="block max-h-[78svh] max-w-[84vw] object-contain sm:max-w-[80vw]" />
+          {isVideo ? (
+            <video
+              src={photo.src}
+              controls
+              autoPlay
+              playsInline
+              className="block max-h-[68svh] max-w-[84vw] bg-black sm:max-w-[80vw]"
+            />
+          ) : (
+            <img src={photo.src} alt={photo.alt} draggable="false" className="block max-h-[68svh] max-w-[84vw] object-contain sm:max-w-[80vw]" />
+          )}
+          <p className="min-h-8 px-2 pb-1 pt-3 text-center font-hand text-xl leading-tight text-ink sm:min-h-10 sm:text-2xl">
+            {photo.caption}
+          </p>
         </motion.div>
       </AnimatePresence>
 

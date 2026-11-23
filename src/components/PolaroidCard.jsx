@@ -15,10 +15,13 @@ function PolaroidCard({ photo, position, seed, onOpen }) {
 
   if (failed) return null; // never show a broken image
 
+  const isVideo = photo.type === 'video';
+  const hasCaption = Boolean(photo.caption);
   const rotate = ROTATIONS[(position + seed) % ROTATIONS.length] * (isMobile ? 0.4 : 1);
   const hover = reduce ? undefined : { rotate: 0, y: -8, scale: 1.03 };
   const showTape = position % 3 === 0;
   const showHeart = position % 7 === 3;
+  const kind = isVideo ? 'video' : 'photo';
 
   return (
     <motion.li
@@ -31,27 +34,57 @@ function PolaroidCard({ photo, position, seed, onOpen }) {
       <motion.button
         type="button"
         onClick={() => onOpen(photo.index)}
-        aria-label={`Open photo ${photo.index + 1}`}
+        aria-label={`Open ${kind} ${photo.index + 1}${hasCaption ? `: ${photo.caption}` : ''}`}
         style={{ rotate }}
         whileHover={hover}
         whileFocus={hover}
         whileTap={reduce ? undefined : { scale: 0.98 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-        className={`relative mx-auto block bg-white p-1.5 shadow-polaroid sm:p-2 ${WIDTHS[position % 4]} ${BOTTOM_PAD[position % 4]}`}
+        className={`relative mx-auto block bg-white p-1.5 text-center shadow-polaroid sm:p-2 ${WIDTHS[position % 4]} ${
+          hasCaption ? '' : BOTTOM_PAD[position % 4]
+        }`}
       >
         {showTape && (
           <span aria-hidden="true" className="absolute -top-2.5 left-1/2 z-10 h-5 w-14 -translate-x-1/2 -rotate-3 bg-blush-300/60" />
         )}
         {showHeart && <HeartIcon className="absolute -bottom-2 -right-2 z-10 h-6 w-6 text-dustyrose-400 drop-shadow" />}
-        <img
-          src={photo.src}
-          alt={photo.alt}
-          loading="lazy"
-          decoding="async"
-          onLoad={() => setLoaded(true)}
-          onError={() => setFailed(true)}
-          className={`block w-full bg-cream-200 object-cover ${loaded ? 'h-auto' : 'aspect-[4/5]'}`}
-        />
+
+        {isVideo ? (
+          <span className="relative block">
+            {/* #t=0.1 makes the browser show a still frame as the thumbnail */}
+            <video
+              src={`${photo.src}#t=0.1`}
+              muted
+              playsInline
+              preload="metadata"
+              aria-hidden="true"
+              onLoadedData={() => setLoaded(true)}
+              onError={() => setFailed(true)}
+              className="block aspect-[4/5] w-full bg-cream-200 object-cover"
+            />
+            <span aria-hidden="true" className="absolute inset-0 grid place-items-center">
+              <span className="grid h-12 w-12 place-items-center rounded-full bg-white/85 text-dustyrose-500 shadow-polaroid">
+                <svg viewBox="0 0 24 24" className="ml-0.5 h-5 w-5" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+              </span>
+            </span>
+          </span>
+        ) : (
+          <img
+            src={photo.src}
+            alt={photo.alt}
+            loading="lazy"
+            decoding="async"
+            onLoad={() => setLoaded(true)}
+            onError={() => setFailed(true)}
+            className={`block w-full bg-cream-200 object-cover ${loaded ? 'h-auto' : 'aspect-[4/5]'}`}
+          />
+        )}
+
+        {hasCaption && (
+          <span className="block px-1 pb-1.5 pt-2 font-hand text-lg leading-tight text-ink sm:text-xl">
+            {photo.caption}
+          </span>
+        )}
       </motion.button>
     </motion.li>
   );

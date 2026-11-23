@@ -9,6 +9,10 @@ export default {
         dustyrose: { 300: '#E0B4BA', 400: '#CF949C', 500: '#B97580' },
         ink: '#4A3236',
       },
+      keyframes: {
+  loop: { from: { transform: 'translateX(0)' }, to: { transform: 'translateX(-50%)' } },
+},
+animation: { loop: 'loop 40s linear infinite' },
       fontFamily: {
         display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
         hand: ['Caveat', 'cursive'],
