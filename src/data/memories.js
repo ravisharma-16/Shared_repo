@@ -94,7 +94,7 @@ const files = {
     { file: 'Videos.mp4', caption: 'Our favorite memories, in motion' },
     { file: '222.jpeg', caption: 'Every moment with you feels like home' },
     { file: '223.jpeg', caption: 'Kept this one close to my heart' },
-    { file: '224.jpeg', caption: 'Just us, being happy together' },
+    { file: '224.jpeg', caption: 'She Being.. She ' },
   ],
 };
 
